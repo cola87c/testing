@@ -1,0 +1,65 @@
+services:
+  mysql:
+    image: mysql:8.0.42
+    container_name: mysql
+    env_file:
+      - .env
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: email_sender
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - email-app-net
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$MYSQL_ROOT_PASSWORD" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  redis:
+    image: redis:7.0.15-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - email-app-net
+
+  email-sender-backend:
+    image: cevrljakovic/email-backend
+    container_name: backend
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - email-app-net
+
+  email-sender-frontend:
+    image: cevrljakovic/email-frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    networks:
+      - email-app-net
+
+volumes:
+  mysql_data:
+  redis_data:
+
+networks:
+  email-app-net:

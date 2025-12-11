@@ -27,7 +27,7 @@
 		<url/>
 	</scm>
 	<properties>
-		<java.version>24</java.version>
+		<java.version>23</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -221,8 +221,8 @@
 							<version>1.6.1</version>
 						</path>
 					</annotationProcessorPaths>
-					<source>24</source>
-					<target>24</target>
+					<source>23</source>
+					<target>23</target>
 				</configuration>
 			</plugin>
 			<plugin>
